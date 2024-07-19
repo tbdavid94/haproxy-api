@@ -27,27 +27,3 @@ jobs:
         context: .
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/haproxy:${{ secrets.DOCKER_TAG }}
-    - name: Save Docker image to file
-      run: |
-          docker save haproxy:${{ secrets.DOCKER_TAG }} | gzip > haproxy_${{ secrets.DOCKER_TAG }}.tar.gz
-
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      with:
-        tag_name: ${{ secrets.DOCKER_TAG }}
-        release_name: Release ${{ secrets.DOCKER_TAG }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Docker image to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./haproxy_${{ secrets.DOCKER_TAG }}.tar.gz
-        asset_name: haproxy_${{ secrets.DOCKER_TAG }}.tar.gz
-        asset_content_type: application/x-tar
